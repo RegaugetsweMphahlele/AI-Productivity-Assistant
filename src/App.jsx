@@ -1,48 +1,40 @@
 import React, { useState } from 'react';
-import { 
-  LayoutDashboard, Mail, FileText, Calendar, Search, MessageSquare, 
-  Copy, Check, Loader2, Send, ChevronRight, AlertCircle, 
-  Plus, Trash2, Command, ArrowRight, ArrowUpRight
-} from 'lucide-react';
+import { Loader2, Copy, Check, Sparkles, Send, Command, Layout, Cpu, Globe } from 'lucide-react';
 
-// --- STARK MOCK ENGINE ---
-const simulateAI = async (type) => {
-  await new Promise(r => setTimeout(r, 1000));
-  const responses = {
-    email: "SUBJECT: STRATEGIC UPDATE\n\nMESSAGE: We have finalized the roadmap for the upcoming quarter. The core focus remains on AI integration and process optimization.\n\nNEXT STEPS: Review attached documents and confirm by EOD.\n\nSENT VIA CAPACITI AI",
-    meeting: "NOTES SYNTHESIS\n\nDECISIONS:\n- Workflow automation approved.\n- Deadline set for Oct 24.\n\nACTION ITEMS:\n- Design System Audit [Team A]\n- Backend Integration [Team B]",
-    planner: "08:00 — ARCHITECTURE REVIEW\n11:00 — OPERATIONAL SYNC\n14:00 — DEEP WORK SESSION\n\nPRIORITY: HIGH IMPACT TASKS ONLY.",
-    research: "CORE INSIGHTS:\n1. Automation efficiency is up 34%.\n2. Cognitive load reduced via structured AI prompts.\n\nRECOMMENDATION: Scale high-context LLM usage.",
-    chat: "SYSTEM ACTIVE. HOW CAN I ASSIST YOUR WORKFLOW?"
-  };
-  return responses[type] || "COMPLETE.";
+// --- IMAGERY ASSETS (Modern Abstract Renders) ---
+const IMAGES = {
+  hero: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop",
+  email: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=400&auto=format&fit=crop",
+  meeting: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop",
+  planner: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?q=80&w=400&auto=format&fit=crop",
+  research: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=400&auto=format&fit=crop",
 };
 
-// --- MODERNIST UI COMPONENTS ---
+const simulateAI = async () => {
+  await new Promise(r => setTimeout(r, 1500));
+  return "## SYNTHESIS COMPLETE\n\nBased on your objectives, I have generated a high-fidelity strategy. The core focus is on cross-functional alignment and resource optimization for the CAPACITI project.\n\n- Milestone 1: Data Integration\n- Milestone 2: Stakeholder Review\n- Milestone 3: Deployment Phase";
+};
 
-const NavButton = ({ active, icon: Icon, label, onClick }) => (
-  <button 
-    onClick={onClick}
-    className={`w-full flex items-center justify-between px-6 py-4 transition-all duration-200 group border-b border-white/10 ${
-      active ? 'bg-white text-black' : 'bg-black text-white hover:bg-zinc-900'
-    }`}
-  >
-    <div className="flex items-center gap-4">
-      <Icon className={`w-5 h-5 ${active ? 'text-black' : 'text-white'}`} />
-      <span className="text-xs font-bold uppercase tracking-[0.2em]">{label}</span>
-    </div>
-    {active ? <ArrowRight className="w-4 h-4" /> : <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white" />}
-  </button>
+// --- COMPONENTS ---
+
+const GlassCard = ({ children, className = "" }) => (
+  <div className={`backdrop-blur-xl bg-white/5 border border-white/10 rounded-[2rem] shadow-2xl ${className}`}>
+    {children}
+  </div>
 );
 
-const StarkButton = ({ onClick, loading, children }) => (
+const NavItem = ({ active, label, onClick, id }) => (
   <button 
     onClick={onClick}
-    disabled={loading}
-    className="group flex items-center justify-center gap-3 px-8 py-5 bg-black text-white hover:bg-blue-700 transition-all duration-300 disabled:opacity-50"
+    className={`relative px-6 py-3 rounded-full text-sm font-semibold transition-all duration-500 ${
+      active ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+    }`}
   >
-    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Command className="w-5 h-5" />}
-    <span className="text-sm font-black uppercase tracking-widest">{children}</span>
+    {active && (
+      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full -z-10 blur-sm opacity-50 animate-pulse" />
+    )}
+    {active && <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full -z-10" />}
+    {label}
   </button>
 );
 
@@ -53,180 +45,160 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [input, setInput] = useState('');
-  const [copied, setCopied] = useState(false);
 
-  const triggerAI = async () => {
-    if (!input && tab !== 'home') return;
+  const runAI = async () => {
     setLoading(true);
-    const res = await simulateAI(tab);
+    const res = await simulateAI();
     setResult(res);
     setLoading(false);
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(result);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
-    <div className="flex h-screen bg-white text-black font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/30 overflow-x-hidden">
       
-      {/* SIDEBAR - SOLID BLACK */}
-      <aside className="w-80 bg-black flex flex-col border-r border-black shrink-0 overflow-hidden">
-        <div className="p-10 mb-10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-none flex items-center justify-center text-white">
-              <Command className="w-5 h-5" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter text-white">CAPACITI</span>
+      {/* BACKGROUND ELEMENTS */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/20 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 blur-[120px] rounded-full" />
+      </div>
+
+      {/* HEADER / NAV */}
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+        <GlassCard className="px-3 py-2 flex items-center gap-1 bg-black/40">
+          <div className="flex items-center gap-2 px-4 mr-4 border-r border-white/10">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
+            <span className="text-xs font-black uppercase tracking-widest italic">Capaciti.AI</span>
           </div>
-          <div className="text-[10px] font-bold text-blue-600 uppercase tracking-[0.3em]">AI Skills Accelerator</div>
-        </div>
+          <NavItem id="home" label="Hub" active={tab === 'home'} onClick={() => setTab('home')} />
+          <NavItem id="email" label="Email" active={tab === 'email'} onClick={() => setTab('email')} />
+          <NavItem id="meeting" label="Meeting" active={tab === 'meeting'} onClick={() => setTab('meeting')} />
+          <NavItem id="planner" label="Planner" active={tab === 'planner'} onClick={() => setTab('planner')} />
+          <NavItem id="research" label="Research" active={tab === 'research'} onClick={() => setTab('research')} />
+        </GlassCard>
+      </nav>
 
-        <nav className="flex-1">
-          <NavButton active={tab === 'home'} icon={LayoutDashboard} label="Hub" onClick={() => {setTab('home'); setResult('');}} />
-          <NavButton active={tab === 'email'} icon={Mail} label="Email Bot" onClick={() => {setTab('email'); setResult('');}} />
-          <NavButton active={tab === 'meeting'} icon={FileText} label="Synthesizer" onClick={() => {setTab('meeting'); setResult('');}} />
-          <NavButton active={tab === 'planner'} icon={Calendar} label="Architect" onClick={() => {setTab('planner'); setResult('');}} />
-          <NavButton active={tab === 'research'} icon={Search} label="Analyst" onClick={() => {setTab('research'); setResult('');}} />
-          <NavButton active={tab === 'chat'} icon={MessageSquare} label="Assistant" onClick={() => {setTab('chat'); setResult('');}} />
-        </nav>
-
-        <div className="p-10 border-t border-white/10">
-          <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] mb-4">Current Session</div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-blue-600" />
-            <span className="text-xs font-bold text-white uppercase tracking-widest">Neural Link Active</span>
-          </div>
-        </div>
-      </aside>
-
-      {/* WORKSPACE - STARK WHITE */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-white">
+      {/* MAIN CONTENT */}
+      <main className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
         
-        {/* Header Bar */}
-        <header className="h-24 border-b border-black flex items-center justify-between px-12 shrink-0">
-          <div className="text-xs font-black uppercase tracking-[0.5em] text-black/30">
-            {tab === 'home' ? 'Global Overview' : `Module // ${tab}`}
-          </div>
-          <div className="flex gap-4">
-             <div className="px-4 py-2 border border-black text-[10px] font-black uppercase tracking-widest">Protocol 2.5</div>
-             <div className="px-4 py-2 bg-black text-white text-[10px] font-black uppercase tracking-widest">Secure</div>
-          </div>
-        </header>
+        {tab === 'home' ? (
+          <div className="space-y-20 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            {/* HERO SECTION */}
+            <div className="relative h-[500px] rounded-[3rem] overflow-hidden group">
+              <img src={IMAGES.hero} className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-105" alt="Hero" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent" />
+              <div className="absolute bottom-12 left-12 right-12">
+                <h1 className="text-7xl font-bold tracking-tighter mb-4 leading-none">
+                  Intelligence <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Unbound.</span>
+                </h1>
+                <p className="text-lg text-slate-400 max-w-xl font-medium">
+                  Experience the next generation of workplace synthesis for the CAPACITI Skills Accelerator.
+                </p>
+              </div>
+            </div>
 
-        {/* Content - Pure Black and White */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-6xl mx-auto px-12 py-20">
+            {/* FEATURE FLOW (No Blocks) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {[
+                { id: 'email', title: 'Smart Email Bot', img: IMAGES.email, desc: 'Sophisticated correspondence synthesis.' },
+                { id: 'meeting', title: 'Meeting Synthesizer', img: IMAGES.meeting, desc: 'Abstract notes to executive clarity.' },
+                { id: 'planner', title: 'Workplace Architect', img: IMAGES.planner, desc: 'Strategic scheduling via AI logic.' },
+                { id: 'research', title: 'Data Analyst', img: IMAGES.research, desc: 'Deep dive market research insights.' }
+              ].map(item => (
+                <div 
+                  key={item.id} 
+                  onClick={() => setTab(item.id)}
+                  className="relative h-64 rounded-[2.5rem] overflow-hidden cursor-pointer group hover:ring-2 ring-cyan-500/50 transition-all duration-500"
+                >
+                  <img src={item.img} className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700" alt={item.title} />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+                  <div className="relative p-10 h-full flex flex-col justify-center">
+                    <h3 className="text-2xl font-bold mb-2 transition-transform duration-500 group-hover:translate-x-2">{item.title}</h3>
+                    <p className="text-slate-400 text-sm">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 animate-in fade-in slide-in-from-right-10 duration-700">
             
-            {tab === 'home' ? (
-              <div className="space-y-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <section className="space-y-6">
-                  <h1 className="text-8xl font-black tracking-tighter leading-[0.8] text-black">
-                    AI <br/> WORKPLACE <br/> <span className="text-blue-600">PRODUCTIVITY.</span>
-                  </h1>
-                  <p className="text-xl font-medium max-w-xl leading-relaxed text-black/60">
-                    High-precision intelligence tools for modern workplace synthesis. Select a protocol from the sidebar to begin.
-                  </p>
-                </section>
-
-                <div className="grid grid-cols-2 gap-px bg-black border border-black">
-                  {[
-                    { id: 'email', title: 'Email Bot', desc: 'Professional correspondence engineering.' },
-                    { id: 'meeting', title: 'Synthesizer', desc: 'Raw notes to executive summaries.' },
-                    { id: 'planner', title: 'Architect', desc: 'Strategic scheduling and priorities.' },
-                    { id: 'research', title: 'Analyst', desc: 'Deep data summarization.' }
-                  ].map(item => (
-                    <button 
-                      key={item.id}
-                      onClick={() => setTab(item.id)}
-                      className="bg-white p-12 text-left hover:bg-blue-600 hover:text-white transition-all duration-300 group"
-                    >
-                      <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">{item.title}</h3>
-                      <p className="text-sm font-bold opacity-60 group-hover:opacity-100">{item.desc}</p>
-                      <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
-                        Launch <ArrowUpRight className="w-4 h-4" />
-                      </div>
-                    </button>
-                  ))}
+            {/* INPUT PANEL */}
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <div className="text-cyan-400 text-xs font-black uppercase tracking-[0.4em] mb-2 flex items-center gap-2">
+                  <Sparkles className="w-3 h-3" /> System Activation
                 </div>
+                <h2 className="text-5xl font-bold tracking-tighter capitalize">{tab} Module</h2>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-                
-                {/* Inputs */}
-                <div className="space-y-10">
-                  <div className="space-y-2 border-l-4 border-black pl-6">
-                    <h2 className="text-4xl font-black tracking-tighter uppercase">{tab} Protocol</h2>
-                    <p className="text-sm font-bold text-black/40 uppercase tracking-widest">Data Input Required</p>
-                  </div>
-                  
-                  <textarea 
-                    className="w-full h-80 p-8 border-2 border-black rounded-none text-lg font-bold focus:ring-0 focus:border-blue-600 outline-none transition-all placeholder:text-black/10"
-                    placeholder={`Paste ${tab} data here...`}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                  />
 
-                  <StarkButton onClick={triggerAI} loading={loading}>
-                    Process Data
-                  </StarkButton>
+              <GlassCard className="p-2 overflow-hidden">
+                <textarea 
+                  className="w-full h-80 p-8 bg-transparent border-none text-xl font-medium focus:ring-0 outline-none placeholder:text-slate-600 resize-none"
+                  placeholder={`Provide context for the ${tab} algorithm...`}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+                <div className="p-4 bg-white/5 border-t border-white/5 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Neural Input Ready</span>
+                  <button 
+                    onClick={runAI}
+                    disabled={loading}
+                    className="px-8 py-3 bg-white text-black rounded-full font-bold text-sm hover:bg-cyan-400 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Execute
+                  </button>
                 </div>
+              </GlassCard>
+            </div>
 
-                {/* Outputs */}
-                <div className={`space-y-10 transition-all duration-500 ${result ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-4'}`}>
-                  <div className="flex items-center justify-between border-b-2 border-black pb-4">
-                    <span className="text-xs font-black uppercase tracking-[0.3em]">Synthesized Output</span>
-                    {result && (
-                      <button onClick={handleCopy} className="text-xs font-black uppercase flex items-center gap-2 hover:text-blue-600 transition-colors">
-                        {copied ? <Check className="w-4 h-4 text-blue-600" /> : <Copy className="w-4 h-4" />}
-                        {copied ? 'Success' : 'Copy'}
-                      </button>
-                    )}
-                  </div>
+            {/* OUTPUT PANEL */}
+            <div className={`space-y-6 transition-all duration-1000 ${result ? 'opacity-100' : 'opacity-20'}`}>
+              <div className="flex items-center justify-between px-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 italic">Synthesized Intelligence</span>
+                {result && (
+                  <button onClick={() => navigator.clipboard.writeText(result)} className="text-xs hover:text-cyan-400 flex items-center gap-2 transition-colors">
+                    <Copy className="w-3 h-3" /> Copy Output
+                  </button>
+                )}
+              </div>
 
-                  <div className="bg-black text-white p-10 min-h-[400px]">
-                    {loading ? (
-                      <div className="space-y-4">
-                        <div className="h-6 w-full bg-white/20 animate-pulse" />
-                        <div className="h-6 w-2/3 bg-white/20 animate-pulse" />
-                        <div className="h-6 w-3/4 bg-white/20 animate-pulse" />
-                      </div>
-                    ) : (
-                      <pre className="text-xl font-bold leading-relaxed whitespace-pre-wrap font-sans italic">
-                        {result || '// Waiting for system execution...'}
-                      </pre>
-                    )}
-                  </div>
-
-                  {result && (
-                    <div className="border border-black p-6">
-                      <div className="text-[10px] font-black uppercase tracking-widest mb-4 opacity-30">Prompt Engineering Metadata</div>
-                      <div className="text-[11px] font-bold font-mono leading-relaxed uppercase">
-                        ROLE: EXECUTIVE_SYNTHESIZER <br/>
-                        OBJECTIVE: HIGH_PRECISION_ANALYSIS <br/>
-                        CONTEXT: {input.substring(0, 20)}...
-                      </div>
+              <GlassCard className="p-10 min-h-[450px] relative overflow-hidden">
+                {loading && (
+                  <div className="absolute inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-10">
+                    <div className="text-center space-y-4">
+                      <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mx-auto" />
+                      <div className="text-xs font-black uppercase tracking-widest text-cyan-400">Processing Neural Pathways...</div>
                     </div>
-                  )}
+                  </div>
+                )}
+                <div className="prose prose-invert max-w-none">
+                   <pre className="whitespace-pre-wrap font-sans text-lg leading-relaxed text-slate-300 italic">
+                    {result || "// System idling. Waiting for input command..."}
+                   </pre>
                 </div>
+              </GlassCard>
 
-              </div>
-            )}
-
+              {result && (
+                <div className="px-6 py-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-mono text-cyan-400/80 leading-relaxed uppercase tracking-wider">
+                  Algorithm: GPT-4-Synthesis-Link // Mode: High Precision // Context: ${tab}_Protocol
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* Footer Bar */}
-        <footer className="h-16 border-t border-black flex items-center justify-between px-12 shrink-0 bg-white">
-          <div className="flex items-center gap-4">
-            <AlertCircle className="w-4 h-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">AI verification required before implementation.</span>
-          </div>
-          <div className="text-[10px] font-black uppercase tracking-[0.4em]">©2025 CAPACITI SYSTEMS</div>
-        </footer>
+        )}
       </main>
+
+      {/* FOOTER */}
+      <footer className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-7xl px-6 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">
+        <div className="flex items-center gap-4">
+          <Globe className="w-3 h-3" /> 
+          Verifying Protocol 2025.04
+        </div>
+        <div className="text-right">
+          Capaciti AI Assistant // Skills Accelerator
+        </div>
+      </footer>
     </div>
   );
 }
